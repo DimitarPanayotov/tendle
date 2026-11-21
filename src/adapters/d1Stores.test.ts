@@ -61,12 +61,13 @@ describe("d1 stores, all or nothing", () => {
 });
 
 describe("d1 stores, listing rounds", () => {
-  it("reads a date's rounds in two queries however many players there are", async () => {
+  it("reads a date's rounds with each round's finds in order, in two queries", async () => {
     const db = wrap(freshDb());
     const stores = createD1Stores(db);
-    for (const id of ["p1", "p2", "p3", "p4"]) {
-      await stores.rounds.saveRound({ playerId: id, date: "2026-12-01", found: [2, 1], strikes: 1 });
-    }
+    await stores.rounds.saveRound({ playerId: "p1", date: "2026-12-01", found: [2, 1], strikes: 1 });
+    await stores.rounds.saveRound({ playerId: "p2", date: "2026-12-01", found: [], strikes: 3 });
+    await stores.rounds.saveRound({ playerId: "p3", date: "2026-12-01", found: [5, 3, 4], strikes: 0 });
+    await stores.rounds.saveRound({ playerId: "p4", date: "2026-12-02", found: [9], strikes: 2 });
     let queries = 0;
     const counting: D1Database = {
       batch: db.batch,
@@ -76,7 +77,11 @@ describe("d1 stores, listing rounds", () => {
       },
     };
     const listed = await createD1Stores(counting).rounds.listRounds("2026-12-01");
-    expect(listed).toHaveLength(4);
+    expect(listed).toEqual([
+      { playerId: "p1", date: "2026-12-01", found: [2, 1], strikes: 1 },
+      { playerId: "p2", date: "2026-12-01", found: [], strikes: 3 },
+      { playerId: "p3", date: "2026-12-01", found: [5, 3, 4], strikes: 0 },
+    ]);
     expect(queries).toBe(2);
   });
 });

@@ -43,8 +43,30 @@ describe("validateDailyList", () => {
 
   it("refuses a list with more than 10 entries", () => {
     const list = makeList();
-    list.entries.push({ rank: 11, answer: "Extra", aliases: [] });
-    expect(rulesOf(list)).toEqual(["entry-count"]);
+    list.entries.push({ rank: 10, answer: "Extra", aliases: [] });
+    expect(rulesOf(list)).toContain("entry-count");
+  });
+
+  it("refuses a rank above 10, so a list with no #10 fails", () => {
+    const list = makeList();
+    at(list, 9).rank = 11;
+    const result = validateDailyList(list);
+    expect(rulesOf(list)).toEqual(["rank-out-of-range"]);
+    if (!result.ok) {
+      expect(result.errors[0]?.message).toContain("Entry 10 has rank 11");
+    }
+  });
+
+  it("refuses a rank of 0", () => {
+    const list = makeList();
+    at(list, 0).rank = 0;
+    expect(rulesOf(list)).toEqual(["rank-out-of-range"]);
+  });
+
+  it("refuses a rank that is not a whole number", () => {
+    const list = makeList();
+    at(list, 3).rank = 4.5;
+    expect(rulesOf(list)).toEqual(["rank-out-of-range"]);
   });
 
   it("refuses two entries sharing a rank, naming the rank and entries", () => {

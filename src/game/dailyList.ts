@@ -13,7 +13,7 @@ export interface DailyList {
   entries: DailyListEntry[];
 }
 
-export type DailyListRule = "entry-count" | "duplicate-rank" | "duplicate-name";
+export type DailyListRule = "entry-count" | "rank-out-of-range" | "duplicate-rank" | "duplicate-name";
 
 export interface DailyListError {
   rule: DailyListRule;
@@ -38,6 +38,12 @@ export function validateDailyList(list: DailyList): DailyListResult {
 
   const ranks = new Map<number, number>();
   entries.forEach((entry, index) => {
+    if (!Number.isInteger(entry.rank) || entry.rank < 1 || entry.rank > ENTRIES_PER_LIST) {
+      errors.push({
+        rule: "rank-out-of-range",
+        message: `Entry ${index + 1} has rank ${entry.rank}, but a rank must be a whole number from 1 to ${ENTRIES_PER_LIST}.`,
+      });
+    }
     const first = ranks.get(entry.rank);
     if (first === undefined) {
       ranks.set(entry.rank, index);

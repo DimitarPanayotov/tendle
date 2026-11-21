@@ -20,7 +20,11 @@ export function App() {
       state={state}
       guess={guess}
       onGuessChange={setGuess}
-      onSubmit={() => void controller.submit(guess).then(() => setGuess(""))}
+      onSubmit={() =>
+        void controller.submit(guess).then((sent) => {
+          if (sent) setGuess("");
+        })
+      }
     />
   );
 }

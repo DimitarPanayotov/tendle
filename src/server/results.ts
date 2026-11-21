@@ -18,6 +18,9 @@ export function resultsRoute(stores: Stores): Hono<PlayerIdEnv> {
     if (results === undefined || list === undefined) {
       return context.json({ error: "This day is not settled yet" }, 404);
     }
+    const playerId = context.get("playerId");
+    const round = await stores.rounds.getRound(playerId, date);
+    const score = results.scores[playerId] ?? null;
     return context.json({
       date,
       players: results.players,
@@ -26,7 +29,8 @@ export function resultsRoute(stores: Stores): Hono<PlayerIdEnv> {
         answer: entry.answer,
         foundBy: results.finderCounts[entry.rank] ?? 0,
       })),
-      score: results.scores[context.get("playerId")] ?? null,
+      score,
+      foundRanks: score === null || round === undefined ? null : [...round.found].sort((a, b) => a - b),
     });
   });
   return route;

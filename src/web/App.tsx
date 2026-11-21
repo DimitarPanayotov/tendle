@@ -2,12 +2,16 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { GameView } from "./GameView";
 import { createGameApi } from "./gameApi";
 import { createGameController } from "./gameController";
+import { createResultsApi, yesterdayUtc } from "./resultsApi";
+import { YesterdayView } from "./YesterdayView";
 
 /** The page a player plays on: wires the controller to the view. */
 export function App() {
   const controller = useMemo(() => createGameController(createGameApi()), []);
   const [state, setState] = useState(controller.getState());
   const [guess, setGuess] = useState("");
+  const resultsApi = useMemo(() => createResultsApi(), []);
+  const [showYesterday, setShowYesterday] = useState(false);
 
   useEffect(() => {
     const unsubscribe = controller.subscribe(() => setState(controller.getState()));
@@ -16,15 +20,21 @@ export function App() {
   }, [controller]);
 
   return (
-    <GameView
-      state={state}
-      guess={guess}
-      onGuessChange={setGuess}
-      onSubmit={() =>
-        void controller.submit(guess).then((sent) => {
-          if (sent) setGuess("");
-        })
-      }
-    />
+    <>
+      <GameView
+        state={state}
+        guess={guess}
+        onGuessChange={setGuess}
+        onSubmit={() =>
+          void controller.submit(guess).then((sent) => {
+            if (sent) setGuess("");
+          })
+        }
+      />
+      <button type="button" onClick={() => setShowYesterday(!showYesterday)}>
+        Yesterday
+      </button>
+      {showYesterday ? <YesterdayView api={resultsApi} date={yesterdayUtc()} /> : null}
+    </>
   );
 }

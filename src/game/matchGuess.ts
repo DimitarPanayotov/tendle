@@ -35,7 +35,7 @@ export function matchGuess(guess: string, entries: DailyListEntry[]): DailyListE
   if (/\d/.test(key)) return NO_MATCH;
   for (const entry of entries) {
     const close = names(entry).some(
-      (name) => name.length >= MIN_TYPO_LENGTH && !/\d/.test(name) && withinOneTypo(key, name),
+      (name) => name.replace(/ /g, "").length >= MIN_TYPO_LENGTH && !/\d/.test(name) && withinOneTypo(key, name),
     );
     if (close) return entry;
   }

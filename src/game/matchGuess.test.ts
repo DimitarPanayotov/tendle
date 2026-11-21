@@ -7,6 +7,7 @@ const entries: DailyListEntry[] = [
   { rank: 2, answer: "Blink-182", aliases: [] },
   { rank: 3, answer: "Adele", aliases: [] },
   { rank: 4, answer: "Cher", aliases: [] },
+  { rank: 5, answer: "Jay Z", aliases: [] },
 ];
 const [beyonce, blink, adele, cher] = entries;
 
@@ -40,6 +41,7 @@ describe("matchGuess", () => {
   it("requires exact match for answers under 5 letters", () => {
     expect(matchGuess("Cher", entries)).toBe(cher);
     expect(matchGuess("Cheb", entries)).toBe("no match");
+    expect(matchGuess("Jay X", entries)).toBe("no match");
   });
 
   it("requires exact match when digits are involved", () => {

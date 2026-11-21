@@ -28,3 +28,25 @@ describe("dayScore", () => {
     expect(dayScore(all.slice(1), 100)).toBe(9 * 10);
   });
 });
+
+describe("bad input", () => {
+  test("entryScore refuses more finders than players", () => {
+    expect(() => entryScore(5, 4)).toThrow(RangeError);
+  });
+
+  test("entryScore refuses negative, fractional and NaN counts", () => {
+    expect(() => entryScore(-1, 10)).toThrow(RangeError);
+    expect(() => entryScore(1.5, 10)).toThrow(RangeError);
+    expect(() => entryScore(Number.NaN, 10)).toThrow(RangeError);
+    expect(() => entryScore(1, Number.NaN)).toThrow(RangeError);
+    expect(() => entryScore(0, -1)).toThrow(RangeError);
+  });
+
+  test("dayScore refuses more found entries than a list holds", () => {
+    expect(() => dayScore(Array<number>(11).fill(1), 1)).toThrow(RangeError);
+  });
+
+  test("dayScore passes on a bad count from one entry", () => {
+    expect(() => dayScore([2], 1)).toThrow(RangeError);
+  });
+});

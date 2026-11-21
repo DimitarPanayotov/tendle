@@ -59,3 +59,24 @@ describe("d1 stores, all or nothing", () => {
     });
   });
 });
+
+describe("d1 stores, listing rounds", () => {
+  it("reads a date's rounds in two queries however many players there are", async () => {
+    const db = wrap(freshDb());
+    const stores = createD1Stores(db);
+    for (const id of ["p1", "p2", "p3", "p4"]) {
+      await stores.rounds.saveRound({ playerId: id, date: "2026-12-01", found: [2, 1], strikes: 1 });
+    }
+    let queries = 0;
+    const counting: D1Database = {
+      batch: db.batch,
+      prepare: (sql) => {
+        queries += 1;
+        return db.prepare(sql);
+      },
+    };
+    const listed = await createD1Stores(counting).rounds.listRounds("2026-12-01");
+    expect(listed).toHaveLength(4);
+    expect(queries).toBe(2);
+  });
+});

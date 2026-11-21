@@ -3,6 +3,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/pr
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { App } from "./App";
 import type { GameApi, GuessReply, Today } from "./gameApi";
+import { STRIKE_DISPLAY_MS } from "./gameController";
 
 const SLOTS = Array.from({ length: 10 }, (_, index) => ({ rank: index + 1 }));
 const ENTRIES = SLOTS.map(({ rank }) => ({ rank, answer: `Answer${rank}`, finders: 11 - rank }));
@@ -89,6 +90,35 @@ describe("the end of a round", () => {
     await screen.findByText(/Could not load your score/);
     expect(screen.getAllByText(/Answer\d+/)).toHaveLength(10);
     expect(screen.queryByRole("button", { name: "Share" })).toBeNull();
+  });
+
+  test("a third strike followed by a failed today() keeps the message past the strike timer", async () => {
+    vi.useFakeTimers();
+    try {
+      const playing: Today = { ...ENDED_BY_STRIKES, strikesLeft: 1 };
+      delete playing.entries;
+      delete playing.players;
+      delete playing.score;
+      delete playing.shareText;
+      const today = vi.fn().mockResolvedValueOnce(playing).mockRejectedValue(new Error("down"));
+      const guess: GuessReply = {
+        outcome: "strike",
+        found: playing.found,
+        strikesLeft: 0,
+        over: true,
+        entries: ENTRIES,
+      };
+      render(<App api={{ today, guess: async () => guess }} copyText={async () => {}} />);
+      await vi.advanceTimersByTimeAsync(0);
+      fireEvent.input(screen.getByLabelText("Your guess"), { target: { value: "nope" } });
+      fireEvent.click(screen.getByRole("button", { name: "Guess" }));
+      await vi.advanceTimersByTimeAsync(0);
+      expect(screen.getByText(/Could not load your score/)).toBeTruthy();
+      await vi.advanceTimersByTimeAsync(STRIKE_DISPLAY_MS * 2);
+      expect(screen.getByText(/Could not load your score/)).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   test("Share copies the share text and says so; a refused copy says so too", async () => {

@@ -86,18 +86,24 @@ export function createGameController(api: GameApi) {
     }
   }
 
+  /** Keeps the strike timer from wiping the message when it fires. */
+  function showEndError() {
+    clearTimeout(strikeTimer);
+    setNotice("end-error");
+  }
+
   /** Asks for today's game again to get the round-end data; the screen stays as it is when that fails. */
   async function loadEnd(foundRanks: number[]) {
     try {
       const today = await api.today();
-      if (today === "no-list") return setNotice("end-error");
+      if (today === "no-list") return showEndError();
       if (state.status !== "playing") return;
       const end = summarize(today, foundRanks);
       if (end) set({ ...state, end });
-      else setNotice("end-error");
+      else showEndError();
     } catch {
       // The answers from the guess reply stay on screen; say the summary is missing.
-      setNotice("end-error");
+      showEndError();
     }
   }
 

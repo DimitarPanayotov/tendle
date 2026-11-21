@@ -141,10 +141,17 @@ describe("POST /api/guess", () => {
 
   test("refuses a body that is not JSON or has no usable guess", async () => {
     const { app, stores } = await setup();
-    for (const body of ["not json", "null", {}, { guess: 5 }, { guess: "  " }, { guess: "a".repeat(201) }]) {
+    for (const body of ["not json", "null", {}, { guess: 5 }, { guess: "  " }, { guess: "a".repeat(101) }]) {
       expect((await post(app, body)).status).toBe(400);
     }
     expect(await stores.rounds.getRound(ID, DATE)).toBeUndefined();
+  });
+
+  test("accepts a guess of 100 characters", async () => {
+    const { app } = await setup();
+    const response = await post(app, { guess: "a".repeat(100) });
+    expect(response.status).toBe(200);
+    expect((await response.json()).outcome).toBe("strike");
   });
 
   test("is 404 before the game starts and when there is no list", async () => {

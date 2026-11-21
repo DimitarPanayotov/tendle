@@ -5,7 +5,7 @@ import type { Stores } from "../game/ports";
 import { guess, isOver, MAX_STRIKES, type Round, startRound } from "../game/round";
 import { type PlayerIdEnv, requirePlayerId } from "./playerId";
 
-const MAX_GUESS_LENGTH = 200;
+const MAX_GUESS_LENGTH = 100;
 
 /** The guess text of a request body, or undefined when the body has none that is usable. */
 function guessText(body: unknown): string | undefined {

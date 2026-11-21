@@ -28,7 +28,14 @@
     "**/.oxlintrc.json",
     "**/tsconfig*.json",
     ".dependency-cruiser.json",
-    "vitest.config.ts"
+    "vitest.config.ts",
+    "pnpm-workspace.yaml"
   ],
-  "test_paths": ["test/**", "tests/**", "**/__tests__/**", "**/*.test.*", "**/*.spec.*"]
+  "test_paths": [
+    "test/**",
+    "tests/**",
+    "**/__tests__/**",
+    "**/*.test.*",
+    "**/*.spec.*"
+  ]
 }

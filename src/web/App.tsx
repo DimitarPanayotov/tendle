@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "preact/hooks";
+import { ConsentBanner } from "./ConsentBanner";
 import { GameView } from "./GameView";
 import { createGameApi, type GameApi } from "./gameApi";
 import { createGameController } from "./gameController";
@@ -29,6 +30,7 @@ export function App({
 
   return (
     <>
+      <ConsentBanner />
       <GameView
         state={state}
         guess={guess}

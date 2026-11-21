@@ -1,4 +1,5 @@
 import { useEffect, useState } from "preact/hooks";
+import { AdSlot } from "./AdSlot";
 import type { Results, ResultsApi } from "./resultsApi";
 
 type State =
@@ -46,6 +47,7 @@ export function YesterdayView({ api, date }: { api: ResultsApi; date: string }) 
           </li>
         ))}
       </ol>
+      <AdSlot />
     </section>
   );
 }

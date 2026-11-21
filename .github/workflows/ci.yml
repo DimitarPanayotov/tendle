@@ -1,0 +1,38 @@
+# The required check `ci`. It runs the same commands as the checks in
+# .factory/factory.json, inside the Node image the factory's worker uses,
+# with read access only. The tools are called directly, not through
+# package.json scripts, so a change to package.json cannot weaken a check.
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # A newer push to a pull request replaces the older run; runs on main all
+  # finish, so every merged commit has a result.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  ci:
+    runs-on: ubuntu-24.04
+    container: node:24-bookworm
+    timeout-minutes: 15
+    steps:
+      # Pinned to a commit: a moved tag must not change what runs here.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install
+        run: command -v pnpm >/dev/null || corepack enable; COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install --frozen-lockfile
+      - name: Lint and folder boundaries
+        run: pnpm exec biome check --error-on-warnings . && pnpm exec depcruise src --config .dependency-cruiser.json
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
+      - name: Test
+        run: pnpm exec vitest run

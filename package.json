@@ -1,0 +1,28 @@
+{
+  "name": "tendle",
+  "private": true,
+  "type": "module",
+  "description": "A daily Top 10 game where rare finds score most",
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "lint": "biome check --error-on-warnings . && depcruise src --config .dependency-cruiser.json",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "dev:web": "vite"
+  },
+  "dependencies": {
+    "hono": "^4.13.19",
+    "preact": "^11.2.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.8",
+    "@preact/preset-vite": "^2.10.6",
+    "dependency-cruiser": "^18.8.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.1"
+  }
+}

@@ -78,6 +78,7 @@ describe("GET /api/today", () => {
     const app = createApp({ stores, now: () => new Date("2026-11-01T00:00:00Z") });
     const response = await app.request("/api/today", { headers });
     expect(response.status).toBe(404);
+    expect(await response.json()).toEqual({ error: "The game has not started yet" });
   });
 
   test("refuses a request without a valid player id", async () => {

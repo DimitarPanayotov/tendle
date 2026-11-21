@@ -5,7 +5,9 @@
       "id": "test-fails-without-change",
       "walk": "Read each new test against the old code and say whether it would fail without the change.",
       "catches": "A test that passes with or without the change proves nothing about it.",
-      "paths": ["**"],
+      "paths": [
+        "**"
+      ],
       "team": "",
       "source": "starter playbook, QA lens",
       "added": "2026-11-13"
@@ -14,7 +16,9 @@
       "id": "unhappy-path",
       "walk": "Follow the change down its unhappy path: bad input, an empty result, a failed call, a refused permission.",
       "catches": "The happy path works and the first error a user meets crashes or says nothing.",
-      "paths": ["**"],
+      "paths": [
+        "**"
+      ],
       "team": "",
       "source": "starter playbook, QA lens",
       "added": "2026-11-13"
@@ -23,10 +27,24 @@
       "id": "callers-updated",
       "walk": "Search the repository for every caller of what the change renamed, removed or changed, and check each still works.",
       "catches": "A caller the change did not update still passes the old name or the old shape.",
-      "paths": ["**"],
+      "paths": [
+        "**"
+      ],
       "team": "",
       "source": "starter playbook, QA lens",
       "added": "2026-11-13"
+    },
+    {
+      "id": "for-every-field-the-ticket-gives-a-range",
+      "walk": "For every field the ticket gives a range or set, confirm a test feeds a value just outside it and expects its own refusal message",
+      "catches": "The daily list validator accepted ranks outside 1-10 or non-integer ranks, so a list with no rank 10 passed as valid",
+      "paths": [
+        "src/game/**"
+      ],
+      "team": "",
+      "source": "FT-18, PR #2",
+      "added": "2026-11-21",
+      "lesson": "lesson-4cda1994f8317936d0c885cb3eb2c9b3"
     }
   ]
 }

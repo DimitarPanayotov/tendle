@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import type { Stores } from "../game/ports";
 import { guessRoute } from "./guess";
+import { resultsRoute } from "./results";
 import { todayRoute } from "./today";
 
 export interface AppOptions {
@@ -21,6 +22,7 @@ export function createApp(options: AppOptions = {}): Hono {
   if (options.stores) {
     app.route("/api/today", todayRoute(options.stores, options.now ?? (() => new Date())));
     app.route("/api/guess", guessRoute(options.stores, options.now ?? (() => new Date())));
+    app.route("/api/results", resultsRoute(options.stores));
   }
   return app;
 }

@@ -14,6 +14,18 @@
       }
     },
     {
+      "name": "shipped-code-is-not-node",
+      "comment": "src/ runs on Cloudflare Workers or in the browser, not in Node: it never imports a Node module (node:fs, node:sqlite...). Tests may, since Vitest runs them in Node, and so may scripts/.",
+      "severity": "error",
+      "from": {
+        "path": "^src/",
+        "pathNot": "\\.test\\.tsx?$"
+      },
+      "to": {
+        "dependencyTypes": ["core"]
+      }
+    },
+    {
       "name": "web-talks-to-the-server-over-http",
       "comment": "The page never imports server or database code, so a day's answers can never be bundled into the browser.",
       "severity": "error",

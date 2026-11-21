@@ -33,6 +33,8 @@ export interface RoundStore {
   listRounds(date: string): Promise<StoredRound[]>;
   /** How many players found each rank on a date; ranks nobody found are left out. */
   finderCounts(date: string): Promise<Record<number, number>>;
+  /** The dates of a player's finished rounds (MAX_STRIKES strikes or every entry found), oldest first. */
+  finishedDates(playerId: string): Promise<string[]>;
 }
 
 export interface ResultStore {

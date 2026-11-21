@@ -28,6 +28,8 @@ export type GameApi = {
   /** Today's game, or "no-list" when the server has none for today. */
   today(): Promise<Today | "no-list">;
   guess(text: string): Promise<GuessReply>;
+  /** The player's current streak in days; rejects when the server cannot be reached or answers badly. */
+  streak?(): Promise<number>;
 };
 
 const NOT_FOUND = 404;
@@ -51,6 +53,9 @@ export function createGameApi(fetchApi: typeof apiFetch = apiFetch): GameApi {
         body: JSON.stringify({ guess: text }),
       });
       return readJson<GuessReply>(response);
+    },
+    async streak() {
+      return (await readJson<{ streak: number }>(await fetchApi("/api/streak"))).streak;
     },
   };
 }

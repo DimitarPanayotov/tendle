@@ -18,6 +18,8 @@ export type GameState =
       strikesLeft: number;
       over: boolean;
       notice?: Notice;
+      /** Days in a row played; left out when unknown. */
+      streak?: number;
     };
 
 /** Fills each slot with its answer only when the server has returned that answer. */
@@ -52,6 +54,17 @@ export function createGameController(api: GameApi) {
     if (notice === "strike") strikeTimer = setTimeout(() => setNotice(undefined), STRIKE_DISPLAY_MS);
   }
 
+  /** Asks for the streak and shows it; a failed call leaves the game as it is. */
+  async function loadStreak() {
+    if (!api.streak) return;
+    try {
+      const days = await api.streak();
+      if (state.status === "playing") set({ ...state, streak: days });
+    } catch {
+      // The game plays on without a streak.
+    }
+  }
+
   return {
     getState: () => state,
     subscribe(listener: () => void) {
@@ -71,6 +84,7 @@ export function createGameController(api: GameApi) {
           strikesLeft: today.strikesLeft,
           over: today.strikesLeft <= 0 || today.found.length >= today.slots.length,
         });
+        await loadStreak();
       } catch {
         set({ status: "unreachable" });
       }
@@ -79,7 +93,9 @@ export function createGameController(api: GameApi) {
     async submit(text: string): Promise<boolean> {
       if (state.status !== "playing" || state.over || text.trim() === "") return false;
       try {
-        apply(await api.guess(text));
+        const reply = await api.guess(text);
+        apply(reply);
+        if (reply.over) await loadStreak();
         return true;
       } catch {
         clearTimeout(strikeTimer);

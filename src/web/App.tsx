@@ -3,15 +3,18 @@ import { ConsentBanner } from "./ConsentBanner";
 import { GameView } from "./GameView";
 import { createGameApi, type GameApi } from "./gameApi";
 import { createGameController } from "./gameController";
-import { createResultsApi, yesterdayUtc } from "./resultsApi";
+import { createResultsApi, type ResultsApi, yesterdayUtc } from "./resultsApi";
 import { YesterdayView } from "./YesterdayView";
 
 /** The page a player plays on: wires the controller to the view. */
 export function App({
   api,
+  resultsApi: yesterdayApi,
   copyText = (text: string) => navigator.clipboard.writeText(text),
 }: {
   api?: GameApi;
+  /** Where Yesterday's results come from. */
+  resultsApi?: ResultsApi;
   /** Puts text on the clipboard; rejects when it cannot. */
   copyText?: (text: string) => Promise<void>;
 } = {}) {
@@ -19,7 +22,7 @@ export function App({
   const [shareNotice, setShareNotice] = useState<"copied" | "failed" | undefined>();
   const [state, setState] = useState(controller.getState());
   const [guess, setGuess] = useState("");
-  const resultsApi = useMemo(() => createResultsApi(), []);
+  const resultsApi = useMemo(() => yesterdayApi ?? createResultsApi(), [yesterdayApi]);
   const [showYesterday, setShowYesterday] = useState(false);
 
   useEffect(() => {
@@ -55,7 +58,9 @@ export function App({
       <button type="button" onClick={() => setShowYesterday(!showYesterday)}>
         Yesterday
       </button>
-      {showYesterday ? <YesterdayView api={resultsApi} date={yesterdayUtc()} /> : null}
+      {showYesterday ? (
+        <YesterdayView api={resultsApi} date={yesterdayUtc()} showAd={!(state.status === "playing" && !state.over)} />
+      ) : null}
     </>
   );
 }

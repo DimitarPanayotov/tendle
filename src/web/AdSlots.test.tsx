@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from "@testing-library/preact";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/preact";
 import { afterEach, describe, expect, test } from "vitest";
 import { App } from "./App";
 import type { GameApi, Today } from "./gameApi";
@@ -47,6 +47,21 @@ describe("ad slots", () => {
     render(<App api={api(PLAYING)} />);
     await screen.findByText("Strikes left: 2");
     expect(screen.queryAllByLabelText("Ad slot")).toHaveLength(0);
+  });
+
+  test("none appears in Yesterday's results opened mid-round, but one does once the round is over", async () => {
+    const yesterday = resultsApi(RESULTS);
+    const open = async (today: Today) => {
+      render(<App api={api(today)} resultsApi={yesterday} />);
+      await screen.findByText(today.entries ? /settles at midnight/ : "Strikes left: 2");
+      fireEvent.click(screen.getByRole("button", { name: "Yesterday" }));
+      await screen.findByText("Your score: 12");
+    };
+    await open(PLAYING);
+    expect(screen.queryAllByLabelText("Ad slot")).toHaveLength(0);
+    cleanup();
+    await open(ENDED);
+    await waitFor(() => expect(screen.getAllByLabelText("Ad slot")).toHaveLength(2));
   });
 
   test("none appears while loading or when the server cannot be reached", async () => {

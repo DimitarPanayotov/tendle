@@ -11,7 +11,16 @@ type State =
 const share = (foundBy: number, players: number) => (players > 0 ? `${Math.round((foundBy / players) * 100)}%` : "0%");
 
 /** Yesterday's results: the player's score and how many players found each entry. */
-export function YesterdayView({ api, date }: { api: ResultsApi; date: string }) {
+export function YesterdayView({
+  api,
+  date,
+  showAd = true,
+}: {
+  api: ResultsApi;
+  date: string;
+  /** False while a round is being played, so no ad slot shows beside the playing area. */
+  showAd?: boolean;
+}) {
   const [state, setState] = useState<State>({ status: "loading" });
 
   useEffect(() => {
@@ -47,7 +56,7 @@ export function YesterdayView({ api, date }: { api: ResultsApi; date: string }) 
           </li>
         ))}
       </ol>
-      <AdSlot />
+      {showAd ? <AdSlot /> : null}
     </section>
   );
 }

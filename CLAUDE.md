@@ -18,7 +18,7 @@ A daily Top 10 game: everyone gets the same list, guesses its entries, and the e
 - `src/web/`: the page (Preact, built with Vite). It talks to the server over HTTP only.
 - The boundaries between these folders are rules in `.dependency-cruiser.json`, checked by `pnpm run lint` and by `src/boundaries.test.ts`.
 - Code in `src/` ships to Cloudflare Workers or the browser, never Node: it imports no Node module and uses no Node global (the boundary rules and Biome refuse both). Tests run in Node and may, such as `node:sqlite` for an in-memory database and `node:fs` to read `migrations/`; so may `scripts/`.
-- Tests sit next to the code they test: `name.ts` and `name.test.ts`.
+- Tests sit next to the code they test: `name.ts` and `name.test.ts`. That holds in `scripts/` too: Vitest runs `scripts/**/*.test.ts`.
 
 ## Rules the code does not show
 

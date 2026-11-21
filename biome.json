@@ -27,5 +27,29 @@
   },
   "files": {
     "includes": ["**", "!.factory"]
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/**", "!src/**/*.test.ts", "!src/**/*.test.tsx"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedGlobals": {
+              "level": "error",
+              "options": {
+                "deniedGlobals": {
+                  "process": "src/ runs on Cloudflare or in the browser, not in Node.",
+                  "Buffer": "src/ runs on Cloudflare or in the browser, not in Node.",
+                  "require": "src/ uses ES modules.",
+                  "__dirname": "src/ runs on Cloudflare or in the browser, not in Node.",
+                  "__filename": "src/ runs on Cloudflare or in the browser, not in Node.",
+                  "global": "src/ runs on Cloudflare or in the browser, not in Node."
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
 }

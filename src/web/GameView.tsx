@@ -1,3 +1,4 @@
+import { AdSlot } from "./AdSlot";
 import type { GameState } from "./gameController";
 import { InfoPanels } from "./InfoPanels";
 
@@ -89,6 +90,7 @@ export function GameView({ state, guess, onGuessChange, onSubmit, onShare, share
             Share
           </button>
           {shareNotice ? <p role="status">{SHARE_NOTICES[shareNotice]}</p> : null}
+          <AdSlot />
         </section>
       ) : null}
       {state.notice ? <p role="status">{NOTICES[state.notice]}</p> : null}

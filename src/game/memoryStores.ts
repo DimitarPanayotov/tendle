@@ -1,5 +1,6 @@
-import type { DailyList } from "./dailyList";
+import { type DailyList, ENTRIES_PER_LIST } from "./dailyList";
 import type { DayResults, ListStore, ResultStore, RoundStore, StoredRound, Stores } from "./ports";
+import { MAX_STRIKES } from "./round";
 
 // Copies keep callers from changing what is stored, as a real database would.
 const copy = <T>(value: T): T => structuredClone(value);
@@ -40,6 +41,15 @@ export function createMemoryStores(): Stores {
         for (const rank of new Set(round.found)) counts[rank] = (counts[rank] ?? 0) + 1;
       }
       return counts;
+    },
+    async finishedDates(playerId) {
+      return [...rounds.entries()]
+        .filter(([, day]) => {
+          const round = day.get(playerId);
+          return round !== undefined && (round.strikes >= MAX_STRIKES || new Set(round.found).size >= ENTRIES_PER_LIST);
+        })
+        .map(([date]) => date)
+        .sort();
     },
   };
 

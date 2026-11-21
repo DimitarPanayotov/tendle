@@ -1,5 +1,6 @@
-import type { DailyList } from "../game/dailyList";
+import { type DailyList, ENTRIES_PER_LIST } from "../game/dailyList";
 import type { DayResults, StoredRound, Stores } from "../game/ports";
+import { MAX_STRIKES } from "../game/round";
 
 /** The part of a D1 statement the stores use. */
 export interface D1PreparedStatement {
@@ -137,6 +138,17 @@ export function createD1Stores(db: D1Database): Stores {
         const counts: Record<number, number> = {};
         for (const r of rows.results) counts[r.rank] = r.n;
         return counts;
+      },
+      async finishedDates(playerId) {
+        const rows = await run(
+          `SELECT r.date AS date FROM rounds r WHERE r.player_id = ? AND (r.strikes >= ?
+             OR (SELECT COUNT(*) FROM round_finds f WHERE f.date = r.date AND f.player_id = r.player_id) >= ?)
+           ORDER BY r.date`,
+          playerId,
+          MAX_STRIKES,
+          ENTRIES_PER_LIST,
+        ).all<{ date: string }>();
+        return rows.results.map((r) => r.date);
       },
     },
     results: {

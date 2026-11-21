@@ -59,6 +59,7 @@ export function GameView({ state, guess, onGuessChange, onSubmit }: GameViewProp
           Guess
         </button>
       </form>
+      {state.streak ? <p>🔥 {state.streak === 1 ? "1 day" : `${state.streak} days`}</p> : null}
       <p>Strikes left: {state.strikesLeft}</p>
       {state.notice ? <p role="status">{NOTICES[state.notice]}</p> : null}
       <InfoPanels />

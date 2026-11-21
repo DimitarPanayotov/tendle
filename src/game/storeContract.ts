@@ -115,6 +115,16 @@ export function runStoreContract(makeStores: () => Stores | Promise<Stores>, { d
       expect(await rounds.finderCounts(DATE)).toEqual({});
     });
 
+    it("lists the dates of a player's finished rounds, oldest first", async () => {
+      const { rounds } = await makeStores();
+      await rounds.saveRound(round("p1", OTHER_DATE, [], 3));
+      await rounds.saveRound(round("p1", DATE, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 1));
+      await rounds.saveRound(round("p1", "2026-12-03", [1, 2], 2));
+      await rounds.saveRound(round("p2", "2026-12-04", [], 3));
+      expect(await rounds.finishedDates("p1")).toEqual([DATE, OTHER_DATE]);
+      expect(await rounds.finishedDates("nobody")).toEqual([]);
+    });
+
     it("does not let a caller change what is stored", async () => {
       const { rounds } = await makeStores();
       const mine = round("p1", DATE, [1]);

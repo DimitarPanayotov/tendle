@@ -75,13 +75,16 @@ export function createGameController(api: GameApi) {
         set({ status: "unreachable" });
       }
     },
-    async submit(text: string) {
-      if (state.status !== "playing" || state.over || text.trim() === "") return;
+    /** Resolves true when the guess reached the server, so the page keeps the typed text when it did not. */
+    async submit(text: string): Promise<boolean> {
+      if (state.status !== "playing" || state.over || text.trim() === "") return false;
       try {
         apply(await api.guess(text));
+        return true;
       } catch {
         clearTimeout(strikeTimer);
         setNotice("error");
+        return false;
       }
     },
   };

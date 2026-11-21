@@ -89,7 +89,12 @@ describe("game controller", () => {
     });
     const controller = await play({ guess }, "   ");
     expect(guess).not.toHaveBeenCalled();
-    await controller.submit("pear");
+    expect(await controller.submit("pear")).toBe(false);
     expect(playing(controller).notice).toBe("error");
+  });
+
+  test("submit says whether the guess reached the server", async () => {
+    const controller = await play({}, "");
+    expect(await controller.submit("pear")).toBe(true);
   });
 });

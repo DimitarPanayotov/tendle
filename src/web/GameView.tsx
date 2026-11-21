@@ -1,4 +1,5 @@
 import type { GameState } from "./gameController";
+import { InfoPanels } from "./InfoPanels";
 
 export type GameViewProps = {
   state: GameState;
@@ -26,6 +27,7 @@ export function GameView({ state, guess, onGuessChange, onSubmit }: GameViewProp
       <main>
         <h1>Tendle</h1>
         <p role="status">{MESSAGES[state.status]}</p>
+        <InfoPanels />
       </main>
     );
   }
@@ -59,6 +61,7 @@ export function GameView({ state, guess, onGuessChange, onSubmit }: GameViewProp
       </form>
       <p>Strikes left: {state.strikesLeft}</p>
       {state.notice ? <p role="status">{NOTICES[state.notice]}</p> : null}
+      <InfoPanels />
     </main>
   );
 }

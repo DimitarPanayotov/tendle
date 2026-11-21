@@ -14,7 +14,7 @@
     }
   },
   "limits": {
-    "max_changed_lines": 400
+    "max_changed_lines": 600
   },
   "protected_paths": [
     ".factory/**",

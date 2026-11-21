@@ -1,9 +1,26 @@
-/** The page a player sees. For now it only says what is coming. */
+import { useEffect, useMemo, useState } from "preact/hooks";
+import { GameView } from "./GameView";
+import { createGameApi } from "./gameApi";
+import { createGameController } from "./gameController";
+
+/** The page a player plays on: wires the controller to the view. */
 export function App() {
+  const controller = useMemo(() => createGameController(createGameApi()), []);
+  const [state, setState] = useState(controller.getState());
+  const [guess, setGuess] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = controller.subscribe(() => setState(controller.getState()));
+    void controller.load();
+    return unsubscribe;
+  }, [controller]);
+
   return (
-    <main>
-      <h1>Tendle</h1>
-      <p>A daily Top 10 game: the entries few other players found score the most. Coming soon.</p>
-    </main>
+    <GameView
+      state={state}
+      guess={guess}
+      onGuessChange={setGuess}
+      onSubmit={() => void controller.submit(guess).then(() => setGuess(""))}
+    />
   );
 }

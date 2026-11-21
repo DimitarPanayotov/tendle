@@ -1,10 +1,18 @@
-import type { FoundEntry, GameApi, GuessReply } from "./gameApi";
+import type { EndEntry, FoundEntry, GameApi, GuessReply, Today } from "./gameApi";
 
 /** How long a strike stays on screen. */
 export const STRIKE_DISPLAY_MS = 1500;
 
-export type Notice = "strike" | "already-found" | "error";
+export type Notice = "strike" | "already-found" | "error" | "end-error";
 export type SlotView = { rank: number; answer?: string };
+
+/** What the screen shows once the round has ended. */
+export type RoundEnd = {
+  entries: (EndEntry & { found: boolean })[];
+  players: number;
+  score: number;
+  shareText: string;
+};
 
 export type GameState =
   | { status: "loading" }
@@ -20,6 +28,7 @@ export type GameState =
       notice?: Notice;
       /** Days in a row played; left out when unknown. */
       streak?: number;
+      end?: RoundEnd;
     };
 
 /** Fills each slot with its answer only when the server has returned that answer. */
@@ -28,6 +37,18 @@ function fill(slots: SlotView[], entries: FoundEntry[]): SlotView[] {
     const entry = entries.find((candidate) => candidate.rank === slot.rank);
     return entry ? { rank: slot.rank, answer: entry.answer } : slot;
   });
+}
+
+/** The round-end summary, or undefined when the server has not sent it. */
+function summarize(today: Today, foundRanks: number[]): RoundEnd | undefined {
+  const { entries, players, score, shareText } = today;
+  if (!entries || players === undefined || score === undefined || shareText === undefined) return undefined;
+  return {
+    entries: entries.map((entry) => ({ ...entry, found: foundRanks.includes(entry.rank) })),
+    players,
+    score,
+    shareText,
+  };
 }
 
 /** The page's state and its calls to the API, with no view in it. */
@@ -65,6 +86,21 @@ export function createGameController(api: GameApi) {
     }
   }
 
+  /** Asks for today's game again to get the round-end data; the screen stays as it is when that fails. */
+  async function loadEnd(foundRanks: number[]) {
+    try {
+      const today = await api.today();
+      if (today === "no-list") return setNotice("end-error");
+      if (state.status !== "playing") return;
+      const end = summarize(today, foundRanks);
+      if (end) set({ ...state, end });
+      else setNotice("end-error");
+    } catch {
+      // The answers from the guess reply stay on screen; say the summary is missing.
+      setNotice("end-error");
+    }
+  }
+
   return {
     getState: () => state,
     subscribe(listener: () => void) {
@@ -76,13 +112,16 @@ export function createGameController(api: GameApi) {
       try {
         const today = await api.today();
         if (today === "no-list") return set({ status: "no-list" });
+        const foundRanks = today.found.map((entry) => entry.rank);
+        const over = today.strikesLeft <= 0 || today.found.length >= today.slots.length;
         set({
           status: "playing",
           gameNumber: today.gameNumber,
           title: today.title,
           slots: fill(today.slots, today.found),
           strikesLeft: today.strikesLeft,
-          over: today.strikesLeft <= 0 || today.found.length >= today.slots.length,
+          over,
+          end: over ? summarize(today, foundRanks) : undefined,
         });
         await loadStreak();
       } catch {
@@ -95,7 +134,10 @@ export function createGameController(api: GameApi) {
       try {
         const reply = await api.guess(text);
         apply(reply);
-        if (reply.over) await loadStreak();
+        if (reply.over) {
+          await loadEnd(reply.found.map((entry) => entry.rank));
+          await loadStreak();
+        }
         return true;
       } catch {
         clearTimeout(strikeTimer);

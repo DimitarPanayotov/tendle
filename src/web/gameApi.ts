@@ -9,7 +9,14 @@ export type Today = {
   slots: { rank: number }[];
   found: FoundEntry[];
   strikesLeft: number;
+  /** The four below come only once the player's round is over. */
+  entries?: EndEntry[];
+  players?: number;
+  score?: number;
+  shareText?: string;
 };
+
+export type EndEntry = { rank: number; answer: string; finders: number };
 
 export type GuessOutcome = "found" | "strike" | "already-found" | "refused";
 

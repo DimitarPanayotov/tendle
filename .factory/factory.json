@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "default_branch": "main",
+  "setup": "command -v pnpm >/dev/null || corepack enable; COREPACK_ENABLE_DOWNLOAD_PROMPT=0 pnpm install --frozen-lockfile",
+  "checks": {
+    "lint": {
+      "run": "pnpm exec biome check --error-on-warnings . && pnpm exec depcruise src --config .dependency-cruiser.json"
+    },
+    "typecheck": {
+      "run": "pnpm exec tsc --noEmit"
+    },
+    "test": {
+      "run": "pnpm exec vitest run"
+    }
+  },
+  "limits": {
+    "max_changed_lines": 400
+  },
+  "protected_paths": [
+    ".factory/**",
+    ".github/**",
+    "**/.env*",
+    "**/migrations/**",
+    "**/eslint.config.*",
+    "**/.eslintrc*",
+    "**/biome.json",
+    "**/biome.jsonc",
+    "**/.oxlintrc.json",
+    "**/tsconfig*.json",
+    ".dependency-cruiser.json",
+    "vitest.config.ts"
+  ],
+  "test_paths": ["test/**", "tests/**", "**/__tests__/**", "**/*.test.*", "**/*.spec.*"]
+}

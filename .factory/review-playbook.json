@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "walks": [
+    {
+      "id": "test-fails-without-change",
+      "walk": "Read each new test against the old code and say whether it would fail without the change.",
+      "catches": "A test that passes with or without the change proves nothing about it.",
+      "paths": ["**"],
+      "team": "",
+      "source": "starter playbook, QA lens",
+      "added": "2026-11-13"
+    },
+    {
+      "id": "unhappy-path",
+      "walk": "Follow the change down its unhappy path: bad input, an empty result, a failed call, a refused permission.",
+      "catches": "The happy path works and the first error a user meets crashes or says nothing.",
+      "paths": ["**"],
+      "team": "",
+      "source": "starter playbook, QA lens",
+      "added": "2026-11-13"
+    },
+    {
+      "id": "callers-updated",
+      "walk": "Search the repository for every caller of what the change renamed, removed or changed, and check each still works.",
+      "catches": "A caller the change did not update still passes the old name or the old shape.",
+      "paths": ["**"],
+      "team": "",
+      "source": "starter playbook, QA lens",
+      "added": "2026-11-13"
+    }
+  ]
+}

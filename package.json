@@ -21,8 +21,10 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.8",
     "@preact/preset-vite": "^2.10.6",
+    "@testing-library/preact": "3.2.6",
     "@types/node": "^24.19.2",
     "dependency-cruiser": "^18.8.0",
+    "happy-dom": "21.0.4",
     "tsx": "4.23.15",
     "typescript": "^6.0.3",
     "vite": "^8.3.8",

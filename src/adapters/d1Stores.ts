@@ -106,11 +106,28 @@ export function createD1Stores(db: D1Database): Stores {
       },
       getRound,
       async listRounds(date) {
-        const players = await run("SELECT player_id FROM rounds WHERE date = ? ORDER BY player_id", date).all<{
-          player_id: string;
-        }>();
-        const rounds = await Promise.all(players.results.map((p) => getRound(p.player_id, date)));
-        return rounds.filter((r): r is StoredRound => r !== undefined);
+        const [roundRows, findRows] = await Promise.all([
+          run("SELECT player_id, strikes FROM rounds WHERE date = ? ORDER BY player_id", date).all<{
+            player_id: string;
+            strikes: number;
+          }>(),
+          run("SELECT player_id, rank FROM round_finds WHERE date = ? ORDER BY player_id, position", date).all<{
+            player_id: string;
+            rank: number;
+          }>(),
+        ]);
+        const foundBy = new Map<string, number[]>();
+        for (const f of findRows.results) {
+          const found = foundBy.get(f.player_id);
+          if (found) found.push(f.rank);
+          else foundBy.set(f.player_id, [f.rank]);
+        }
+        return roundRows.results.map((r) => ({
+          playerId: r.player_id,
+          date,
+          found: foundBy.get(r.player_id) ?? [],
+          strikes: r.strikes,
+        }));
       },
       async finderCounts(date) {
         const rows = await run("SELECT rank, COUNT(*) AS n FROM round_finds WHERE date = ? GROUP BY rank", date).all<{

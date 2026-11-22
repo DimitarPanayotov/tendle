@@ -14,6 +14,7 @@ async function describeEnd(
   gameNumber: number,
   entries: DailyList["entries"],
   foundRanks: number[],
+  link?: string,
 ) {
   const counts = await stores.rounds.finderCounts(date);
   const players = Math.max(1, (await stores.rounds.listRounds(date)).length);
@@ -27,6 +28,7 @@ async function describeEnd(
     found: foundRanks.map((rank) => ({ rank, finders: finders(rank) })),
     players,
     score,
+    link,
   });
   return {
     entries: [...entries]
@@ -39,7 +41,7 @@ async function describeEnd(
 }
 
 /** Builds the GET /api/today route. Only entries the player has found carry their answer. */
-export function todayRoute(stores: Stores, now: () => Date): Hono<PlayerIdEnv> {
+export function todayRoute(stores: Stores, now: () => Date, shareLink?: string): Hono<PlayerIdEnv> {
   const route = new Hono<PlayerIdEnv>();
   route.use("*", requirePlayerId);
   route.get("/", async (context) => {
@@ -58,7 +60,7 @@ export function todayRoute(stores: Stores, now: () => Date): Hono<PlayerIdEnv> {
       return entry ? [{ rank: entry.rank, answer: entry.answer }] : [];
     });
     const over = round !== undefined && isOver({ list, found: round.found, strikes: round.strikes });
-    const ending = over ? await describeEnd(stores, date, gameNumber, list.entries, foundRanks) : {};
+    const ending = over ? await describeEnd(stores, date, gameNumber, list.entries, foundRanks, shareLink) : {};
     return context.json({
       gameNumber,
       title: list.title,

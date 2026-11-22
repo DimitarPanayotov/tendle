@@ -1,5 +1,7 @@
 # pnpm settings for this repository.
-# esbuild (pulled in by tsx) ships its binary as a normal package; its
-# install script only re-checks it. Never run it: no install script runs here.
+# esbuild (pulled in by tsx and wrangler) and workerd (Cloudflare's runtime,
+# pulled in by wrangler) ship their binaries as normal packages; their
+# install scripts only re-check them. Never run them: no install script runs here.
 allowBuilds:
   esbuild: false
+  workerd: false

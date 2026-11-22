@@ -29,7 +29,8 @@
     "**/tsconfig*.json",
     ".dependency-cruiser.json",
     "vitest.config.ts",
-    "pnpm-workspace.yaml"
+    "pnpm-workspace.yaml",
+    "wrangler.toml"
   ],
   "test_paths": [
     "test/**",

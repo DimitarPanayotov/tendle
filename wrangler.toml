@@ -1,0 +1,23 @@
+# Tendle on Cloudflare: one Worker serves the page (static files) and the API,
+# and settles each day just after midnight UTC. No secrets here: names and
+# ids only. Deploy by hand from the laptop: `pnpm run deploy` (needs
+# `wrangler login`); nothing deploys from GitHub.
+name = "tendle"
+main = "src/server/worker.ts"
+compatibility_date = "2026-11-01"
+
+[assets]
+directory = "./dist/web"
+# The API is the Worker's; every other path is the page.
+run_worker_first = ["/api/*"]
+not_found_handling = "single-page-application"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tendle"
+database_id = "302b4969-9513-4ada-afb1-f734abf60489"
+migrations_dir = "migrations"
+
+[triggers]
+# 00:05 UTC: five minutes after the day changes, settle the day before.
+crons = ["5 0 * * *"]

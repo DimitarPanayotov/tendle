@@ -5,6 +5,15 @@
 name = "tendle"
 main = "src/server/worker.ts"
 compatibility_date = "2026-11-01"
+# The game lives at the workers.dev address only. Preview URLs (one public
+# address per uploaded version) stay off: each would use the real database.
+workers_dev = true
+preview_urls = false
+
+[vars]
+# The address share texts link to. Change it here when the game moves to its
+# own domain; no code change is needed.
+PUBLIC_URL = "https://tendle.dimitar-panayotov.workers.dev"
 
 [assets]
 directory = "./dist/web"

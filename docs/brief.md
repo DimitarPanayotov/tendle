@@ -32,7 +32,7 @@ People who play Wordle-style games and trivia (Krillion, Daily Tens): a few minu
 
 - Display ads around the results page, never inside the playing area.
 - Visitors in the EU must agree to ad cookies first (a consent banner).
-- Free to run for now: Cloudflare's free plan (Workers, D1, Pages, a daily timer) at tendle.pages.dev. Ads need a domain of our own, so one is bought when there are enough players to show ads to.
+- Free to run for now: Cloudflare's free plan (one Worker, D1, a daily timer) at tendle.dimitar-panayotov.workers.dev. Ads need a domain of our own, so one is bought when there are enough players to show ads to.
 
 ## Rules the code must keep
 

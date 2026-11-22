@@ -10,6 +10,8 @@ export interface AppOptions {
   stores?: Stores;
   /** The clock; defaults to the real time. */
   now?: () => Date;
+  /** The link on the share text; without it the built-in link is used. */
+  shareLink?: string;
 }
 
 /**
@@ -21,7 +23,7 @@ export function createApp(options: AppOptions = {}): Hono {
   const app = new Hono();
   app.get("/api/health", (context) => context.json({ ok: true }));
   if (options.stores) {
-    app.route("/api/today", todayRoute(options.stores, options.now ?? (() => new Date())));
+    app.route("/api/today", todayRoute(options.stores, options.now ?? (() => new Date()), options.shareLink));
     app.route("/api/guess", guessRoute(options.stores, options.now ?? (() => new Date())));
     app.route("/api/streak", streakRoute(options.stores, options.now ?? (() => new Date())));
     app.route("/api/results", resultsRoute(options.stores));

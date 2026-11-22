@@ -19,6 +19,8 @@ export interface ShareInput {
   found: FoundEntry[];
   players: number;
   score: number;
+  /** The link on the last line; defaults to SHARE_LINK. */
+  link?: string;
 }
 
 function squareFor(share: number): string {
@@ -28,7 +30,7 @@ function squareFor(share: number): string {
 }
 
 export function buildShareText(input: ShareInput): string {
-  const { gameNumber, found, players, score } = input;
+  const { gameNumber, found, players, score, link } = input;
   if (!Number.isInteger(gameNumber) || gameNumber < 1) {
     throw new RangeError(`Game number must be a whole number from 1 up, got ${gameNumber}`);
   }
@@ -56,5 +58,5 @@ export function buildShareText(input: ShareInput): string {
     return finders === undefined ? MISSED_SQUARE : squareFor(finders / players);
   }).join("");
   const first = `${GAME_NAME} #${gameNumber} · ${byRank.size}/${ENTRY_COUNT} · ${squares} · ${score}`;
-  return `${first}\n${SHARE_LINK}`;
+  return `${first}\n${link || SHARE_LINK}`;
 }

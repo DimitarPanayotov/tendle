@@ -11,6 +11,10 @@ A daily Top 10 game: everyone gets the same list, guesses its entries, and the e
 - Scripts in `scripts/` run with `tsx` (`pnpm exec tsx scripts/<name>.ts`), which resolves the extensionless imports `src/` uses; plain `node` cannot.
 - All three must pass before a change is done. CI (`.github/workflows/ci.yml`) and the factory (`.factory/factory.json`) run the same tools directly, not through these scripts.
 
+## Deploying (a person, from the laptop)
+- One Cloudflare Worker serves the page (`dist/web`, built by Vite) and the API, and settles each day at 00:05 UTC (`wrangler.toml`).
+- `pnpm run db:migrate` applies `migrations/` to the real D1 database; `pnpm run deploy` builds the page and deploys. Both need `wrangler login` on the laptop: no deploy runs from GitHub, and no Cloudflare token is in GitHub.
+
 ## Where things live
 
 - `src/game/`: the rules of the game (matching a guess, scoring by rarity, settling the day). Plain TypeScript: no framework, no database, no network, no imports from other folders. It defines the ports (interfaces) the rest implements.
@@ -31,4 +35,4 @@ A daily Top 10 game: everyone gets the same list, guesses its entries, and the e
 - Never add a comment that switches a check off (`biome-ignore`, `@ts-ignore`, `@ts-expect-error` and the like), and never a comment that excuses a shortcut ("temporary", "the real fix would be…"). Fix the code. If a check is wrong, say so and stop.
 - Comments say why, not what. Functions do one thing and stay short. No magic numbers: name them.
 - English everywhere.
-- Human-only files (the factory refuses a change to them): `.factory/**`, `.github/**`, `biome.json`, `tsconfig*.json`, `.dependency-cruiser.json`, `vitest.config.ts`, `pnpm-workspace.yaml` (which packages may run install scripts: none do), and any `migrations/` folder, so a database schema change is a person's job.
+- Human-only files (the factory refuses a change to them): `.factory/**`, `.github/**`, `biome.json`, `tsconfig*.json`, `.dependency-cruiser.json`, `vitest.config.ts`, `pnpm-workspace.yaml` (which packages may run install scripts: none do), `wrangler.toml` (the deploy), and any `migrations/` folder, so a database schema change is a person's job.

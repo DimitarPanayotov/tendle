@@ -13,7 +13,7 @@ A daily Top 10 game: everyone gets the same list, guesses its entries, and the e
 
 ## Deploying (a person, from the laptop)
 
-- One Cloudflare Worker serves the page (`dist/web`, built by Vite) and the API, and settles each day at 00:05 UTC (`wrangler.toml`).
+- One Cloudflare Worker serves the page (`dist/web`, built by Vite) and the API, and settles each day at 00:05 UTC (`wrangler.toml`). It lives at https://tendle.dimitar-panayotov.workers.dev; share texts link to `PUBLIC_URL` there.
 - `pnpm run db:migrate` applies `migrations/` to the real D1 database; `pnpm run deploy` builds the page and deploys. Both need `wrangler login` on the laptop: no deploy runs from GitHub, and no Cloudflare token is in GitHub.
 
 ## Where things live

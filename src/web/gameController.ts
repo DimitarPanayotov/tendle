@@ -29,6 +29,8 @@ export type GameState =
       notice?: Notice;
       /** Days in a row played; left out when unknown. */
       streak?: number;
+      /** When the next list arrives, as the server sent it. */
+      nextListAt?: string;
       end?: RoundEnd;
     };
 
@@ -127,6 +129,7 @@ export function createGameController(api: GameApi) {
           title: today.title,
           slots: fill(today.slots, today.found),
           strikesLeft: today.strikesLeft,
+          nextListAt: today.nextListAt,
           over,
           end: over ? summarize(today, foundRanks) : undefined,
         });

@@ -9,6 +9,8 @@ export type Today = {
   slots: { rank: number }[];
   found: FoundEntry[];
   strikesLeft: number;
+  /** The next midnight UTC, as an ISO time. */
+  nextListAt?: string;
   /** The four below come only once the player's round is over. */
   entries?: EndEntry[];
   players?: number;

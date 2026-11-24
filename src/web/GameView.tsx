@@ -1,6 +1,7 @@
 import { AdSlot } from "./AdSlot";
 import type { GameState } from "./gameController";
 import { InfoPanels } from "./InfoPanels";
+import { timeLeft } from "./timeLeft";
 
 export type GameViewProps = {
   state: GameState;
@@ -10,6 +11,8 @@ export type GameViewProps = {
   /** Copies the share text; the view shows `shareNotice` after it. */
   onShare?(): void;
   shareNotice?: "copied" | "failed";
+  /** The moment the countdown is counted from; defaults to the present. */
+  now?: Date;
 };
 
 const SHARE_NOTICES = {
@@ -32,7 +35,7 @@ const NOTICES = {
 } as const;
 
 /** The game screen as a pure function of its props. */
-export function GameView({ state, guess, onGuessChange, onSubmit, onShare, shareNotice }: GameViewProps) {
+export function GameView({ state, guess, onGuessChange, onSubmit, onShare, shareNotice, now }: GameViewProps) {
   if (state.status !== "playing") {
     return (
       <main>
@@ -83,6 +86,7 @@ export function GameView({ state, guess, onGuessChange, onSubmit, onShare, share
       </form>
       {state.streak ? <p>🔥 {state.streak === 1 ? "1 day" : `${state.streak} days`}</p> : null}
       <p>Strikes left: {state.strikesLeft}</p>
+      {state.nextListAt ? <p>Next list in {timeLeft(state.nextListAt, now ?? new Date())}</p> : null}
       {state.end ? (
         <section aria-label="Round over">
           <p>Score so far: {state.end.score} (settles at midnight)</p>

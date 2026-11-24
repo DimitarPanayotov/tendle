@@ -19,6 +19,7 @@ const SHARE_NOTICES = {
 
 const MESSAGES = {
   loading: "Loading today's game…",
+  "not-started": "Tendle starts on 1 December 2026.",
   "no-list": "There is no list for today. Come back later.",
   unreachable: "Cannot reach the server. Check your connection and try again.",
 } as const;

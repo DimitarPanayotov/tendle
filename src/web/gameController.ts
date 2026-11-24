@@ -17,6 +17,7 @@ export type RoundEnd = {
 export type GameState =
   | { status: "loading" }
   | { status: "no-list" }
+  | { status: "not-started" }
   | { status: "unreachable" }
   | {
       status: "playing";
@@ -96,7 +97,7 @@ export function createGameController(api: GameApi) {
   async function loadEnd(foundRanks: number[]) {
     try {
       const today = await api.today();
-      if (today === "no-list") return showEndError();
+      if (today === "no-list" || today === "not-started") return showEndError();
       if (state.status !== "playing") return;
       const end = summarize(today, foundRanks);
       if (end) set({ ...state, end });
@@ -117,7 +118,7 @@ export function createGameController(api: GameApi) {
       set({ status: "loading" });
       try {
         const today = await api.today();
-        if (today === "no-list") return set({ status: "no-list" });
+        if (today === "no-list" || today === "not-started") return set({ status: today });
         const foundRanks = today.found.map((entry) => entry.rank);
         const over = today.strikesLeft <= 0 || today.found.length >= today.slots.length;
         set({

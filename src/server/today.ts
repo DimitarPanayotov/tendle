@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { type DailyList, ENTRIES_PER_LIST } from "../game/dailyList";
 import { gameDay } from "../game/gameDay";
+import { nextListAt } from "../game/nextList";
 import type { Stores } from "../game/ports";
 import { isOver, MAX_STRIKES } from "../game/round";
 import { dayScore } from "../game/scoring";
@@ -67,6 +68,7 @@ export function todayRoute(stores: Stores, now: () => Date, shareLink?: string):
       slots: Array.from({ length: ENTRIES_PER_LIST }, (_, index) => ({ rank: index + 1 })),
       found,
       strikesLeft: Math.max(0, MAX_STRIKES - (round?.strikes ?? 0)),
+      nextListAt: nextListAt(now()).toISOString(),
       ...ending,
     });
   });

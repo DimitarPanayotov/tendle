@@ -32,14 +32,15 @@ export type GuessReply = {
 
 /** What the page needs from the server. Both calls reject when the server cannot be reached or answers badly. */
 export type GameApi = {
-  /** Today's game, or "no-list" when the server has none for today. */
-  today(): Promise<Today | "no-list">;
+  /** Today's game, "not-started" before launch day, or "no-list" when the server has none for today. */
+  today(): Promise<Today | "no-list" | "not-started">;
   guess(text: string): Promise<GuessReply>;
   /** The player's current streak in days; rejects when the server cannot be reached or answers badly. */
   streak?(): Promise<number>;
 };
 
 const NOT_FOUND = 404;
+const NOT_STARTED_ERROR = "The game has not started yet";
 async function readJson<T>(response: Response): Promise<T> {
   if (!response.ok) throw new Error(`The server answered ${response.status}`);
   return (await response.json()) as T;
@@ -50,7 +51,10 @@ export function createGameApi(fetchApi: typeof apiFetch = apiFetch): GameApi {
   return {
     async today() {
       const response = await fetchApi("/api/today");
-      if (response.status === NOT_FOUND) return "no-list";
+      if (response.status === NOT_FOUND) {
+        const body = (await response.json().catch(() => undefined)) as { error?: unknown } | undefined;
+        return body?.error === NOT_STARTED_ERROR ? "not-started" : "no-list";
+      }
       return readJson<Today>(response);
     },
     async guess(text) {

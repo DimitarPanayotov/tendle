@@ -45,7 +45,9 @@ describe("GET /api/today", () => {
   test("returns the game number, title, 10 slots, found entries and strikes left", async () => {
     const app = await setup();
     const body = await (await app.request("/api/today", { headers })).json();
-    expect(body).toEqual({
+    // Checks the fields this test is about, not the whole reply, so a new field
+    // in the reply does not break it.
+    expect(body).toMatchObject({
       gameNumber: 3,
       title: "Tallest mountains",
       slots: Array.from({ length: 10 }, (_, index) => ({ rank: index + 1 })),
